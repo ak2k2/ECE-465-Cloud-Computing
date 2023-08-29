@@ -2,6 +2,7 @@ import time
 import numpy as np
 from PIL import Image
 from multiprocessing import Pool, cpu_count
+import matplotlib.pyplot as plt
 
 
 # Calculate Mandelbrot for one row
@@ -14,7 +15,12 @@ def mandelbrot_row(y, w, h, max_iter):
         for i in range(max_iter):
             if abs(z) > 2.0:
                 r = int(255 * i / max_iter)
-                row_data[x] = (r, 0, 0)  # RGB
+                color = plt.cm.get_cmap("hot")(
+                    i / max_iter
+                )  # Get color based on iteration
+                row_data[x] = tuple(
+                    int(c * 255) for c in color[:3]
+                )  # Assign RGB values from color
                 break
             z = z * z + c
     return row_data
@@ -23,7 +29,7 @@ def mandelbrot_row(y, w, h, max_iter):
 # Generate Mandelbrot image using multiprocessing
 def generate_mandelbrot_starmap(w, h, max_iter):
     image_data = np.zeros((h, w, 3), dtype=np.uint8)
-    with Pool() as pool:
+    with Pool(num_cores=cpu_count()) as pool:
         rows_data = pool.starmap(
             mandelbrot_row, [(y, w, h, max_iter) for y in range(h)]
         )
@@ -83,19 +89,19 @@ def generate_mandelbrot_grid(w, h, max_iter, grid_size):
 
 # Main execution
 if __name__ == "__main__":
-    w, h = 5000, 2800  # Image size
-    max_iter = 100  # Max iterations
+    w, h = 4000, 3000  # Image size
+    max_iter = 200  # Max iterations
     num_cores = cpu_count()  # Number of cores to use
 
-    # Without multiprocessing
-    start_time = time.time()
-    image_data_single = generate_mandelbrot_single(w, h, max_iter)
-    print(f"Time taken without multiprocessing: {time.time() - start_time} seconds")
+    # # Without multiprocessing
+    # start_time = time.time()
+    # image_data_single = generate_mandelbrot_single(w, h, max_iter)
+    # print(f"Time taken without multiprocessing: {time.time() - start_time} seconds")
 
-    # With multiprocessing
-    start_time = time.time()
-    image_data_mp = generate_mandelbrot_starmap(w, h, max_iter)
-    print(f"Time taken with multiprocessing: {time.time() - start_time} seconds")
+    # # With multiprocessing
+    # start_time = time.time()
+    # image_data_mp = generate_mandelbrot_starmap(w, h, max_iter)
+    # print(f"Time taken with multiprocessing: {time.time() - start_time} seconds")
 
     # Calculate grid size so that the number of grids is at least equal to num_cores
     grid_size = int((w * h) ** 0.5 // (num_cores) ** 0.5)
@@ -106,7 +112,7 @@ if __name__ == "__main__":
     print(
         f"Grid size: {grid_size}, Total grids: {total_grids}, Number of Cores: {num_cores}"
     )
-
+    # With multiprocessing and grids
     start_time = time.time()
     image_data_grid = generate_mandelbrot_grid(w, h, max_iter, grid_size)
     print(

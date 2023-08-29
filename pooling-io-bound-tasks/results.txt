@@ -1,6 +1,6 @@
 
 ****************************************************************************************************
-Standard sequential execution: note that all the links are fetched by the same thread from the same Process (PID: 1382)
+Standard sequential execution: all the links are fetched by the same thread from within the same python process (PID: 1382), one at a time.
 ****************************************************************************************************
 INFO:root:MainThread - Fetching http://www.google.com
 INFO:root:MainThread ------- PID: 1382 ----- Link: http://www.google.com. HASH: ee213dfd97
@@ -17,8 +17,9 @@ Time taken without parallelization: 12.0283682346344 seconds
 ----------------------------------------------------------------------------------------------------
 
 ****************************************************************************************************
-Parallel execution with Thread Pool: note that each link is still fetched by the same Process (PID: 1382), but by different threads.
-****************************************************************************************************
+Parallel execution with Thread Pool: note that each link is still fetched by the same Process (PID: 1382), but by different threads, ThreadPoolExecutor-0_11, ThreadPoolExecutor-0_1, ThreadPoolExecutor-0_10, ThreadPoolExecutor-0_6, ThreadPoolExecutor-0_0...
+
+
 INFO:root:ThreadPoolExecutor-0_11 ------- PID: 1382 ----- Link: https://www.apple.com. HASH: cbecc4e8ad
 INFO:root:ThreadPoolExecutor-0_1 ------- PID: 1382 ----- Link: https://www.reddit.com/r/wallstreetbets/. HASH: acd4a148e2
 INFO:root:ThreadPoolExecutor-0_10 ------- PID: 1382 ----- Link: https://www.reddit.com/r/programming/. HASH: ae1b50bdb4
@@ -26,10 +27,11 @@ INFO:root:ThreadPoolExecutor-0_6 ------- PID: 1382 ----- Link: https://www.linux
 INFO:root:ThreadPoolExecutor-0_0 ------- PID: 1382 ----- Link: https://www.centos.org. HASH: 33bf683a24
 INFO:root:ThreadPoolExecutor-0_3 ------- PID: 1382 ----- Link: https://www.ubuntu.com. HASH: 0bf24c5ea9
 INFO:root:ThreadPoolExecutor-0_8 ------- PID: 1382 ----- Link: https://www.ecma-international.org. HASH: c1aaa315fe
+
 ----------------------------------------------------------------------------------------------------
 Time taken with Thread Pool: 3.106473922729492 seconds
 ----------------------------------------------------------------------------------------------------
-
+****************************************************************************************************
 
 ****************************************************************************************************
 Parallel execution with Process Pool: note that each link is fetched by a different Process (PID: 1397, 1398, 1401, 1402). In this case, the Global Interpreter Lock (GIL) is lifted to allow true parallel execution.

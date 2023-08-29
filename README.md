@@ -47,7 +47,7 @@
 - **🆔 PIDs**: `1397`, `1398`, `1401`, `1402`
 - **⏱ Time**: 4.77 seconds
 
-<img width="946" alt="process_pool_htop" src="https://github.com/ak2k2/ECE-465-Cloud-Computing/assets/103453421/68fb9a4a-2327-4570-9a65-6624207a6845">
+<img width="1007" alt="ppool-htop" src="https://github.com/ak2k2/ECE-465-Cloud-Computing/assets/103453421/cb0fce2a-6d38-4aa2-94f6-a86de7b0d0ac">
 
 ---
 

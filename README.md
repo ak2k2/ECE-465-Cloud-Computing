@@ -25,7 +25,7 @@
 
 #### **1️⃣ Sequential Execution**
 
-- **🔗 Mode**: All links fetched one-by-one.
+- **🔗 Mode**: All links fetched and processed one-by-one.
 - **🧵 Thread**: `MainThread`
 - **🆔 PID**: `1382`
 - **⏱ Time**: 12.03 seconds
@@ -43,9 +43,11 @@
 
 #### **3️⃣ Parallel Execution with Process Pool**
 
-- **🔗 Mode**: Links fetched by different processes, bypassing Python's GIL.
+- **🔗 Mode**: Links fetched by different processes, bypassing Python's GIL. True parallel execution. 
 - **🆔 PIDs**: `1397`, `1398`, `1401`, `1402`
 - **⏱ Time**: 4.77 seconds
+
+<img width="946" alt="process_pool_htop" src="https://github.com/ak2k2/ECE-465-Cloud-Computing/assets/103453421/68fb9a4a-2327-4570-9a65-6624207a6845">
 
 ---
 

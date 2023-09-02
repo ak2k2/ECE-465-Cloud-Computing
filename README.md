@@ -54,9 +54,9 @@
 ## **📊 Findings**
 
 1. **🚀 Max Speedup with Thread Pool**
-   - **🔍 Insight**: Thread Pool is **3.87x faster** than sequential execution!
+   - **🔍**: Thread Pool Executor is **3.87x faster** than sequential execution!
 
 2. **🐌 Significant Overhead in Process Pool**
-   - **🔍 Insight**: Process Pool is slower due to the overhead of new processes.
+   - **🔍**: Process Pools are slower for this problem since it is bound by non-blocking IO operations (HTTP get requests). Due to the overhead associated with spawning new processes, process pools are generally recommended for CPU-bound problems. 
 
 ---

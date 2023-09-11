@@ -1,11 +1,12 @@
 import time
+from multiprocessing import Pool, cpu_count
+
+import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from multiprocessing import Pool, cpu_count
-import matplotlib.pyplot as plt
 
 
-# Calculate Mandelbrot for one row
+# Create a single row of Mandelbrot image
 def mandelbrot_row(y, w, h, max_iter):
     row_data = np.zeros((w, 3), dtype=np.uint8)
     for x in range(w):

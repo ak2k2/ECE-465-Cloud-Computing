@@ -23,7 +23,7 @@ def mandelbrot_row(y, w, h, max_iter):
     row_data = np.zeros((w, 3), dtype=np.uint8)
     for x in range(w):
         zx, zy = x * (3.5 / w) - 2.5, y * (2.0 / h) - 1.0
-        c = zx + zy * 1j
+        c = complex(zx, zy)
         z = c
         for i in range(max_iter):
             if abs(z) > 2.0:
@@ -73,7 +73,7 @@ def process_grid(start_row, end_row, start_col, end_col, w, h, max_iter):
         for y in range(start_row, end_row):
             for x in range(start_col, end_col):
                 zx, zy = x * (3.5 / w) - 2.5, y * (2.0 / h) - 1.0
-                c = zx + zy * 1j
+                c = complex(zx, zy)
                 z = c
                 for i in range(max_iter):
                     if abs(z) > 2.0:
@@ -100,8 +100,13 @@ def generate_mandelbrot_grid(w, h, max_iter):
 
     for i in range(grid_size):
         for j in range(grid_size):
-            start_row, end_row = i * rows_per_grid, (i + 1) * rows_per_grid
-            start_col, end_col = j * cols_per_grid, (j + 1) * cols_per_grid
+            start_row = i * rows_per_grid
+            start_col = j * cols_per_grid
+
+            # Adjust for the last row and column
+            end_row = (i + 1) * rows_per_grid if i != grid_size - 1 else h
+            end_col = (j + 1) * cols_per_grid if j != grid_size - 1 else w
+
             tasks.append((start_row, end_row, start_col, end_col, w, h, max_iter))
 
     # 8 cores 1:1 mapping
@@ -163,3 +168,15 @@ if __name__ == "__main__":
 
     img_grid = Image.fromarray(image_data_grid, "RGB")
     img_grid.save("artifacts/mandelbrot_grid_cpu.png")
+
+    # Grid based multiprocessing
+    start_time = time.time()
+    image_data_grid_big = generate_mandelbrot_grid(w=800, h=600, max_iter=200)
+    big_grid_elapsed_time = time.time() - start_time
+    print("\n", "=" * 80)
+
+    print(
+        f"Time taken for big set with grid-based multiprocessing: {big_grid_elapsed_time} seconds"
+    )
+    img_grid = Image.fromarray(image_data_grid_big, "RGB")
+    img_grid.save("artifacts/mandelbrot_grid_cpu_big.png")

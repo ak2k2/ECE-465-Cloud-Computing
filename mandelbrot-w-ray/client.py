@@ -67,7 +67,7 @@ def request_mandelbrot_video(
                 maxiter,
             )
         )
-        maxiter += 20  # increase the max iterations for each frame
+        maxiter += 1000  # increase the max iterations for each frame
 
     # Retrieve the frames from the futures.
     frame_images = ray.get(frames)
@@ -99,7 +99,7 @@ def main():
 
         # Default parameters
         default_point = "-1.338238635,-0.057237059"  # Re, Im
-        default_num_frames = "200"
+        default_num_frames = "20"
         default_frame_width = "1000"
         default_frame_height = "1000"  # HD resolution
         default_maxiter = "1000"

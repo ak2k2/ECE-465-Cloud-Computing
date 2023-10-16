@@ -1,8 +1,3 @@
-"""
-Extremely fast Mandelbrot set computation using numpy and numba (credit to Jean-François Puget: https://gist.github.com/jfpuget/60e07a82dece69b011bb)
-
-"""
-
 from __future__ import absolute_import, print_function
 
 import base64
@@ -20,6 +15,10 @@ from PIL import Image
 
 
 def mandelbrot_opencl(q, maxiter):
+    """
+    Fast Mandelbrot set computation using numpy and numba (credit to Jean-François Puget: https://gist.github.com/jfpuget/60e07a82dece69b011bb)
+    """
+
     platforms = cl.get_platforms()
     if not platforms:
         raise ValueError("No OpenCL platforms found.")
@@ -29,13 +28,14 @@ def mandelbrot_opencl(q, maxiter):
     if not devices:
         raise ValueError("No OpenCL devices found on the selected platform.")
 
-    is_mac = plat.system() == "Darwin"  # "Darwin" signifies a MacOS system
+    is_mac = plat.system() == "Darwin"  # "Darwin" for a MacOS system
     if is_mac:
-        device = devices[1]
+        # Chose Intel(R) Iris(TM) Plus Graphics
+        device = devices[
+            1
+        ]  # Because I have a Macbook Pro with a opencl enabled CPU and GPU
     else:
-        device = devices[0]
-
-    print(device.name)
+        device = devices[0]  # My ubuntu server only has a RYZEN
 
     # Create a context with the selected device
     ctx = cl.Context([device])

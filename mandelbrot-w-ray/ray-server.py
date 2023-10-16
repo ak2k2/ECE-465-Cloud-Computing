@@ -1,35 +1,13 @@
-import logging
-import time
-
+# ray-server.py
 import ray
-
-# Setup basic logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s %(levelname)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-
-
-def start_ray():
-    try:
-        # Specify the address of the existing cluster here
-        ray.init("ray://192.168.1.11:6379")
-        logging.info("Connected to the existing Ray cluster.")
-    except ConnectionError:
-        logging.warning(
-            "No existing Ray cluster found or connection failed. Trying to start a new cluster."
-        )
-        try:
-            # Try to start a new Ray cluster
-            ray.init(address="0.0.0.0:6379")
-            logging.info("New Ray cluster started successfully.")
-        except Exception as e:
-            logging.error("Could not start Ray server: {}".format(e))
+import time
 
 
 def main():
-    start_ray()
+    # Initialize Ray. No parameters means it starts in local mode but listens on all interfaces.
+    ray.init(address="auto", _redis_password="5241590000000000")
+
+    print(f"Dashboard URL: {ray.get_dashboard_url()}")
 
     print("Ray Server Started...")
     while True:

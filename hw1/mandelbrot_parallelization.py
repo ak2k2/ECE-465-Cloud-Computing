@@ -135,43 +135,43 @@ if __name__ == "__main__":
     max_iter = 20  # Max iterations
     num_cores = cpu_count()  # Number of cores to use
 
-    # Sequential
-    start_time = time.time()
-    image_data_single = generate_mandelbrot_sequential(w, h, max_iter)
-    sequential_elapsed_time = time.time() - start_time
-    print("\n", "=" * 80)
+    # # Sequential
+    # start_time = time.time()
+    # image_data_single = generate_mandelbrot_sequential(w, h, max_iter)
+    # sequential_elapsed_time = time.time() - start_time
+    # print("\n", "=" * 80)
 
-    # Row/Col based multiprocessing
-    start_time = time.time()
-    image_data_mp = generate_mandelbrot_starmap(w, h, max_iter)
-    row_col_elapsed_time = time.time() - start_time
-    print("\n", "=" * 80)
+    # # Row/Col based multiprocessing
+    # start_time = time.time()
+    # image_data_mp = generate_mandelbrot_starmap(w, h, max_iter)
+    # row_col_elapsed_time = time.time() - start_time
+    # print("\n", "=" * 80)
+
+    # # Grid based multiprocessing
+    # start_time = time.time()
+    # image_data_grid = generate_mandelbrot_grid(w, h, max_iter)
+    # grid_elapsed_time = time.time() - start_time
+    # print("\n", "=" * 80)
+
+    # print("\n\n")
+    # print(f"Time taken without multiprocessing: {sequential_elapsed_time} seconds")
+    # print(f"Time taken with row based parallelism: {row_col_elapsed_time} seconds")
+    # print(f"Time taken with grid-based multiprocessing: {grid_elapsed_time} seconds")
+
+    # print(assert_images_equal(image_data_single, image_data_mp, image_data_grid))
+
+    # img_single = Image.fromarray(image_data_single, "RGB")
+    # img_single.save("artifacts/mandelbrot_single_cpu.png")
+
+    # img_mp = Image.fromarray(image_data_mp, "RGB")
+    # img_mp.save("artifacts/mandelbrot_mp_cpu.png")
+
+    # img_grid = Image.fromarray(image_data_grid, "RGB")
+    # img_grid.save("artifacts/mandelbrot_grid_cpu.png")
 
     # Grid based multiprocessing
     start_time = time.time()
-    image_data_grid = generate_mandelbrot_grid(w, h, max_iter)
-    grid_elapsed_time = time.time() - start_time
-    print("\n", "=" * 80)
-
-    print("\n\n")
-    print(f"Time taken without multiprocessing: {sequential_elapsed_time} seconds")
-    print(f"Time taken with row based parallelism: {row_col_elapsed_time} seconds")
-    print(f"Time taken with grid-based multiprocessing: {grid_elapsed_time} seconds")
-
-    print(assert_images_equal(image_data_single, image_data_mp, image_data_grid))
-
-    img_single = Image.fromarray(image_data_single, "RGB")
-    img_single.save("artifacts/mandelbrot_single_cpu.png")
-
-    img_mp = Image.fromarray(image_data_mp, "RGB")
-    img_mp.save("artifacts/mandelbrot_mp_cpu.png")
-
-    img_grid = Image.fromarray(image_data_grid, "RGB")
-    img_grid.save("artifacts/mandelbrot_grid_cpu.png")
-
-    # Grid based multiprocessing
-    start_time = time.time()
-    image_data_grid_big = generate_mandelbrot_grid(w=800, h=600, max_iter=200)
+    image_data_grid_big = generate_mandelbrot_grid(w=1000, h=1000, max_iter=20)
     big_grid_elapsed_time = time.time() - start_time
     print("\n", "=" * 80)
 

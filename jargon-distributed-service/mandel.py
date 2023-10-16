@@ -1,10 +1,11 @@
+import matplotlib.colors as mcolors
 import numpy as np
-from numba import complex64, float32, float64, guvectorize, int32, njit, vectorize
-from matplotlib import colors
 from matplotlib import pyplot as plt
+from numba import complex64, float32, float64, guvectorize, int32, njit
+import time as t
 
 
-@njit(int32(complex64, int32))
+@njit(int32(complex64, int32), fastmath=True, cache=True)
 def mandelbrot(c, maxiter):
     nreal = 0
     real = 0
@@ -33,18 +34,36 @@ def mandelbrot_set2(xmin, xmax, ymin, ymax, width, height, maxiter):
     return (r1, r2, n3.T)
 
 
-res = mandelbrot_set2(-0.74877, -0.74872, 0.06505, 0.06510, 1000, 1000, 2048)
+def plot_mandelbrot(res):
+    # Extract the iteration counts from the result
+    iteration_counts = res[2]
 
-# plot the output
-dpi = 200
-width = 2000
-height = 2000
-fig = plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
-axes = fig.add_axes([0.0, 0.0, 1.0, 1.0], frameon=False, aspect=1)
-plt.imshow(
-    res[2],
-    origin="lower",
-    extent=[res[0].min(), res[0].max(), res[1].min(), res[1].max()],
-)
+    # Normalize the iteration counts for coloring
+    norm = mcolors.PowerNorm(0.3)  # Using a PowerNorm for non-linear scaling
 
-plt.savefig("mandelbrot.png")
+    # Create a new figure and set the aspect ratio
+    plt.figure(figsize=(10, 10))
+    plt.axis("off")  # Turn off the axis
+
+    # Display the Mandelbrot set, specifying a colormap
+    plt.imshow(iteration_counts, cmap="nipy_spectral", norm=norm)
+
+    # You can save the figure here, or display it
+    plt.savefig(
+        "enhanced_mandelbrot.png", bbox_inches="tight", pad_inches=0, dpi=200
+    )  # High resolution
+    plt.show()  # This will just display the figure
+
+
+# bounds = (-2.5, 1.5, -2.0, 2.0) # full mandelbrot
+# bounds = (-0.8, -0.7, 0.05, 0.15)  # valley of seahorses
+# bounds = (0.175, 0.375, -0.1, 0.1) # elephant valley
+bounds = (-1.25066, -1.25061, 0.02012, 0.02017)  # antenna valley
+
+
+st = t.time()
+res = mandelbrot_set2(*bounds, 1000, 1000, 10000000)
+print(t.time() - st)
+
+# Assuming 'res' is the result from your mandelbrot_set2 function
+plot_mandelbrot(res)

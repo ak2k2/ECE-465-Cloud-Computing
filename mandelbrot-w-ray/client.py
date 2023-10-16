@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 def connect_to_server():
     try:
-        subprocess.run(["ray", "stop"])
+        # subprocess.run(["ray", "stop"])
         subprocess.run("ray start", "--address=192.168.1.155:6379", "--verbose")
         ray.init(address="auto")
 
@@ -132,6 +132,7 @@ def main():
 
         while True:
             time.sleep(60)
+            print("worker alive")
 
 
 if __name__ == "__main__":

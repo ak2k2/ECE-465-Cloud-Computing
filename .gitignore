@@ -3,3 +3,6 @@
 
 # Venv
 rayenv/*
+
+# generated artifacts
+mandelbrot-w-ray/temp/*

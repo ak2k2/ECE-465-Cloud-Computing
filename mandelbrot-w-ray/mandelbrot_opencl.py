@@ -16,6 +16,7 @@ import pyopencl as cl
 import ray
 from matplotlib import pyplot as plt
 from PIL import Image
+import platform as plat
 
 
 def mandelbrot_opencl(q, maxiter):
@@ -27,7 +28,13 @@ def mandelbrot_opencl(q, maxiter):
     devices = platform.get_devices()
     if not devices:
         raise ValueError("No OpenCL devices found on the selected platform.")
-    device = devices[0]
+
+    is_mac = plat.system() == "Darwin"  # "Darwin" signifies a MacOS system
+    if is_mac:
+        device = devices[1]
+    else:
+        device = devices[0]
+
     print(device.name)
 
     # Create a context with the selected device

@@ -59,7 +59,7 @@ def request_mandelbrot_video(
     maxiter: int,
 ) -> str:
     start_delta = 2.5  # View of the whole set
-    end_delta = 0.000005  # Zoomed in this much at the end
+    end_delta = 0.01  # Zoomed in this much at the end
 
     # calculate the zoom levels for each frame
     zoom_levels = np.geomspace(start_delta, end_delta, num_frames)
@@ -112,10 +112,10 @@ def main():
             -1.358238635,  # Re
             -0.037237059,  # Im
         )
-        num_frames = 600  # example frame count
+        num_frames = 40  # example frame count
         frame_dimensions = (1000, 1000)  # HD resolution
-        maxiter = 400  # example max iterations
-        fps = 30
+        maxiter = 200  # example max iterations
+        fps = 5
 
         # Request the Mandelbrot video
 

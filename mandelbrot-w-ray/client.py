@@ -112,7 +112,7 @@ def main():
             -1.358238635,  # Re
             -0.037237059,  # Im
         )
-        num_frames = 40  # example frame count
+        num_frames = 20  # example frame count
         frame_dimensions = (1000, 1000)  # HD resolution
         maxiter = 200  # example max iterations
         fps = 5

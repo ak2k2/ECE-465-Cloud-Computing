@@ -14,7 +14,7 @@ def connect_to_server():
     ray.init(address="auto")
 
 
-def compile_video(frame_images):
+def compile_video(frame_images: list, fps: int = 15) -> str:
     # Save images and store their filepaths
     frames = []
     temp_path = "temp"
@@ -24,7 +24,6 @@ def compile_video(frame_images):
         frames.append(filename)
 
     # Create video from frames
-    fps = 10  # or whatever fps you want
     clip = mpy.ImageSequenceClip(frames, fps=fps)
     video_filename = temp_path + "/demo_zoom.mp4"
     clip.write_videofile(video_filename)
@@ -32,9 +31,15 @@ def compile_video(frame_images):
     return video_filename  # return the filename of created video
 
 
-def request_mandelbrot_video(point, num_frames, frame_dimensions, maxiter):
+def request_mandelbrot_video(
+    point: tuple[float, float],
+    num_frames: int,
+    fps: int,
+    frame_dimensions: tuple[int, int],
+    maxiter: int,
+) -> str:
     start_delta = 2.5  # View of the whole set
-    end_delta = 0.01  # Zoomed in this much at the end
+    end_delta = 0.001  # Zoomed in this much at the end
 
     # calculate the zoom levels for each frame
     zoom_levels = np.geomspace(start_delta, end_delta, num_frames)
@@ -65,45 +70,45 @@ def request_mandelbrot_video(point, num_frames, frame_dimensions, maxiter):
     ]
 
     # Compile the frames into a video
-    video = compile_video(frame_images)
+    video = compile_video(frame_images, fps=15)
 
     return video
 
 
 def main():
-    # Connect to the Ray cluster
-    connect_to_server()
-
-    # Define parameters for the Mandelbrot video request
-    point = (
-        0,
-        0,
-    )  # example coordinates, should be based on your requirements
-    num_frames = 20  # example frame count
-    frame_dimensions = (2000, 2000)  # HD resolution
-    maxiter = 200  # example max iterations
-
-    # Request the Mandelbrot video
-    video_filename = request_mandelbrot_video(
-        point, num_frames, frame_dimensions, maxiter
+    user_input = input(
+        "Do you want to generate a video or act as a worker? (video/worker): "
     )
 
-    print(f"Video compiled: {video_filename}")
+    if user_input.lower() == "video":
+        # Connect to the Ray cluster
+        connect_to_server()
+
+        # Define parameters for the Mandelbrot video request
+        point = (
+            -0.706710842,  # Re
+            -0.288516551,  # Im
+        )
+        num_frames = 100  # example frame count
+        frame_dimensions = (2000, 2000)  # HD resolution
+        maxiter = 100  # example max iterations
+
+        # Request the Mandelbrot video
+        video_filename = request_mandelbrot_video(
+            point, num_frames, frame_dimensions, maxiter
+        )
+
+        print(f"Video compiled: {video_filename}")
+
+    elif user_input.lower() == "worker":
+        import time
+
+        connect_to_server()
+        print("Worker connected to server")
+
+        while True:
+            time.sleep(60)
 
 
 if __name__ == "__main__":
     main()
-    # connect_to_server()
-    # byteframe = generate_frame.remote(
-    #     coords=(-2.0, 1.0, -1.0, 1.0), width=1000, height=1000, maxiter=100
-    # )
-
-    # byteframe = ray.get(byteframe)
-
-    # # display the frame which is a base64 string as an image
-    # imgdata = base64.b64decode(byteframe)
-    # filename = "frame.png"
-    # with open(filename, "wb") as f:
-    #     f.write(imgdata)
-    # image = Image.open(filename)
-    # image.show()

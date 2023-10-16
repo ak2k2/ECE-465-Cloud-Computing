@@ -81,27 +81,6 @@ def mandelbrot_set3(xmin, xmax, ymin, ymax, width, height, maxiter):
     return (r1, r2, n3.T)
 
 
-def save_result(res):
-    # Extract the iteration counts from the result
-    iteration_counts = res[2]
-
-    # Normalize the iteration counts for coloring
-    norm = mcolors.PowerNorm(0.3)  # Using a PowerNorm for non-linear scaling
-
-    # Create a new figure and set the aspect ratio
-    plt.figure(figsize=(20, 20))
-    plt.axis("off")  # Turn off the axis
-    plt.imshow(iteration_counts, cmap="nipy_spectral", norm=norm)
-    plt.savefig("enhanced_mandelbrot.png", bbox_inches="tight", pad_inches=0, dpi=200)
-
-
-# bounds = (-1.25066, -1.25061, 0.02012, 0.02017)
-# st = t.time()
-# res = mandelbrot_set3(*bounds, 10000, 10000, 1000000)
-# print("Duration: ", t.time() - st)
-# save_result(res)
-
-
 @ray.remote
 def generate_frame(coords: tuple, width: int, height: int, maxiter: int):
     # Extract coordinates
@@ -132,6 +111,20 @@ def generate_frame(coords: tuple, width: int, height: int, maxiter: int):
     base64_string = base64_bytes.decode("utf8")
 
     return base64_string
+
+
+# def save_result(res):
+#     # Extract the iteration counts from the result
+#     iteration_counts = res[2]
+
+#     # Normalize the iteration counts for coloring
+#     norm = mcolors.PowerNorm(0.3)  # Using a PowerNorm for non-linear scaling
+
+#     # Create a new figure and set the aspect ratio
+#     plt.figure(figsize=(20, 20))
+#     plt.axis("off")  # Turn off the axis
+#     plt.imshow(iteration_counts, cmap="nipy_spectral", norm=norm)
+#     plt.savefig("enhanced_mandelbrot.png", bbox_inches="tight", pad_inches=0, dpi=100)
 
 
 # ray.init(

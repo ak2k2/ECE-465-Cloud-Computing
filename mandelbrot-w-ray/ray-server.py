@@ -4,7 +4,7 @@ import ray
 
 def main():
     # Initialize Ray
-    ray.init()
+    ray.init(address=None)
 
     # The script should continue running to keep the Ray cluster alive
     print(f"Server ready at {ray.get_runtime_context().get()}")

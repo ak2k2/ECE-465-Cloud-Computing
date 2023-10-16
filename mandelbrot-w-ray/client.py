@@ -97,11 +97,13 @@ def main():
         fps = 30
 
         # Request the Mandelbrot video
+
+        st = time.time()
         video_filename = request_mandelbrot_video(
             point, num_frames, fps, frame_dimensions, maxiter
         )
-
         print(f"Video compiled: {video_filename}")
+        print(f"Time elapsed: {time.time() - st}")
 
     elif user_input.lower() == "worker":
         import time

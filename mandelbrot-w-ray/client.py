@@ -11,7 +11,7 @@ from PIL import Image
 
 
 def connect_to_server():
-    ray.init()  # connect to the running Ray cluster
+    ray.init(address="ray://192.168.1.155:6379")
 
 
 def compile_video(frame_images: list, fps: int = 15) -> str:

@@ -27,7 +27,8 @@ def mandelbrot_opencl(q, maxiter):
     devices = platform.get_devices()
     if not devices:
         raise ValueError("No OpenCL devices found on the selected platform.")
-    device = devices[0]
+    device = devices[1]
+    print(device.name)
 
     # Create a context with the selected device
     ctx = cl.Context([device])

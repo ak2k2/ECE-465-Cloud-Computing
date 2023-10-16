@@ -8,6 +8,7 @@ from mandelbrot_opencl import generate_frame
 from PIL import Image
 
 import io
+import os
 
 
 def connect_to_server():
@@ -87,12 +88,12 @@ def main():
 
         # Define parameters for the Mandelbrot video request
         point = (
-            -0.706710842,  # Re
-            -0.288516551,  # Im
+            -0.7241144,  # Re
+            -0.286370123,  # Im
         )
-        num_frames = 2  # example frame count
-        frame_dimensions = (2000, 2000)  # HD resolution
-        maxiter = 100  # example max iterations
+        num_frames = 150  # example frame count
+        frame_dimensions = (1000, 1000)  # HD resolution
+        maxiter = 200  # example max iterations
         fps = 30
 
         # Request the Mandelbrot video

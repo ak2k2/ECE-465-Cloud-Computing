@@ -11,7 +11,7 @@ import io
 
 
 def connect_to_server():
-    ray.init(address="ray://192.168.1.11:6379", _redis_password="5241590000000000")
+    ray.init(address="auto")  # connect to the running Ray cluster
 
 
 def compile_video(frame_images: list, fps: int = 15) -> str:

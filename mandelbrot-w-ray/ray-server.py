@@ -6,7 +6,7 @@ import time
 def main():
     # Initialize Ray
     ray.init(
-        address="auto",
+        address=None,
         _node_ip_address="192.168.1.11",
         _redis_password="5241590000000000",
     )

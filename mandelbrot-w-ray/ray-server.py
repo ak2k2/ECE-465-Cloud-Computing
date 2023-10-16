@@ -1,17 +1,19 @@
 # ray-server.py
 import ray
+import time
 
 
 def main():
     # Initialize Ray
-    ray.init(address=None)
+    ray.init(
+        address="auto",
+        _node_ip_address="192.168.1.11",
+        _redis_password="5241590000000000",
+    )
 
-    # The script should continue running to keep the Ray cluster alive
-    print(f"Server ready at {ray.get_runtime_context().get()}")
-    # Keep the script alive
-    import time
-
+    print("Ray Server started at 192.168.1.11:6379")
     while True:
+        print("♥ ♥ ♥ ♥")
         time.sleep(60)
 
 

@@ -9,9 +9,31 @@ import ray
 from mandelbrot_opencl import generate_frame
 from PIL import Image
 
+import logging
+
+
+# Set up logging level to debug to see detailed logs from Ray
+logging.basicConfig(level=logging.DEBUG)
+
 
 def connect_to_server():
-    ray.init(address="ray://192.168.1.155:6379")
+    try:
+        # Attempt to connect to the Ray server
+        ray.init(
+            address="ray://192.168.1.155:6379",
+            logging_level=logging.DEBUG,
+            log_to_driver=True,
+        )
+
+        print("Connected to Ray server!")
+
+    except Exception as e:
+        # If there's an exception, print it out
+        print(f"An error occurred: {e}")
+
+
+# Call the function
+connect_to_server()
 
 
 def compile_video(frame_images: list, fps: int = 15) -> str:

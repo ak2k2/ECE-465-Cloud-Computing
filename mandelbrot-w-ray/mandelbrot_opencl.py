@@ -91,22 +91,19 @@ def mandelbrot_set3(xmin, xmax, ymin, ymax, width, height, maxiter):
 
 @ray.remote
 def generate_frame(coords: tuple, width: int, height: int, maxiter: int):
-    # Extract coordinates
-    xmin, xmax, ymin, ymax = coords
-
     # Calculate Mandelbrot set based on provided coordinates
+    xmin, xmax, ymin, ymax = coords
     x, y, mandelbrot_image = mandelbrot_set3(
         xmin, xmax, ymin, ymax, width, height, maxiter
     )
 
-    # Normalize the iteration counts for coloring
-    norm = mcolors.PowerNorm(0.2)  # Using a PowerNorm for non-linear scaling
+    # PowerNorm the iteration counts for coloring
+    norm = mcolors.PowerNorm(0.2)
 
     # Create a plot for the current frame
-    plt.figure(
-        figsize=(width / 100, height / 100), dpi=150
-    )  # Assuming the DPI you'd like to use
-    plt.axis("off")  # Turn off the axis
+    plt.figure(figsize=(width / 100, height / 100), dpi=150)  # set DPI
+
+    plt.axis("off")
     plt.imshow(mandelbrot_image, cmap="nipy_spectral", norm=norm)
 
     # Save the plot to a bytes buffer
@@ -119,45 +116,3 @@ def generate_frame(coords: tuple, width: int, height: int, maxiter: int):
     base64_string = base64_bytes.decode("utf8")
 
     return base64_string
-
-
-# def save_result(res):
-#     # Extract the iteration counts from the result
-#     iteration_counts = res[2]
-
-#     # Normalize the iteration counts for coloring
-#     norm = mcolors.PowerNorm(0.3)  # Using a PowerNorm for non-linear scaling
-
-#     # Create a new figure and set the aspect ratio
-#     plt.figure(figsize=(20, 20))
-#     plt.axis("off")  # Turn off the axis
-#     plt.imshow(iteration_counts, cmap="nipy_spectral", norm=norm)
-#     plt.savefig("enhanced_mandelbrot.png", bbox_inches="tight", pad_inches=0, dpi=100)
-
-
-# ray.init(
-#     address="auto"
-# )  # connect to the running Ray cluster; replace 'auto' with the server address if necessary
-
-# # Define bounds and parameters
-# bounds = (-2.0, 1.0, -1.0, 1.0)  # default Mandelbrot bounds
-# width = 1000  # image width
-# height = 1000  # image height
-# maxiter = 1000  # max iterations for the Mandelbrot set
-
-# # Asynchronously start a task to generate a Mandelbrot frame
-# future = generate_frame.remote(bounds, width, height, maxiter)
-
-# # Wait for the task to complete and get the result (base64 string)
-# base64_string = ray.get(future)
-
-# # Convert the base64 string back to an image
-# image_bytes = base64.b64decode(base64_string)
-# image_buf = BytesIO(image_bytes)
-# image = Image.open(image_buf)
-
-# # Display the image
-# plt.figure(figsize=(6, 6))
-# plt.imshow(image, cmap="nipy_spectral")
-# plt.axis("off")  # Turn off the axis numbers and ticks
-# plt.show()

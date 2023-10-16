@@ -13,8 +13,7 @@ import logging
 import subprocess
 
 
-# Set up logging level to debug to see detailed logs from Ray
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def connect_to_server():
@@ -28,10 +27,6 @@ def connect_to_server():
     except Exception as e:
         # If there's an exception, print it out
         print(f"An error occurred: {e}")
-
-
-# Call the function
-connect_to_server()
 
 
 def compile_video(frame_images: list, fps: int = 15) -> str:
@@ -80,7 +75,7 @@ def request_mandelbrot_video(
                 maxiter,
             )
         )
-        maxiter += 5  # increase the max iterations for each frame
+        maxiter += 20  # increase the max iterations for each frame
 
     # Retrieve the frames from the futures.
     frame_images = ray.get(frames)
@@ -113,8 +108,8 @@ def main():
             -0.057237059,  # Im
         )
         num_frames = 200  # example frame count
-        frame_dimensions = (1000, 1000)  # HD resolution
-        maxiter = 1000  # example max iterations
+        frame_dimensions = (2000, 2000)  # HD resolution
+        maxiter = 2000  # example max iterations
         fps = 15
 
         # Request the Mandelbrot video

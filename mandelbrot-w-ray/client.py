@@ -2,7 +2,6 @@
 import base64
 import io
 import logging
-import subprocess
 import time
 
 import moviepy.editor as mpy
@@ -16,14 +15,10 @@ logging.basicConfig(level=logging.INFO)
 
 def connect_to_server():
     try:
-        # subprocess.run(["ray", "stop"])
-        subprocess.run("ray start", "--address=192.168.1.155:6379")
         ray.init(address="auto")
-
-        print("Connected to Ray server!")
+        print("Sucessfully Initialized Ray!")
 
     except Exception as e:
-        # If there's an exception, print it out
         print(f"An error occurred: {e}")
 
 
@@ -50,11 +45,13 @@ def request_mandelbrot_video(
     fps: int,
     frame_dimensions: tuple[int, int],
     maxiter: int,
+    start_delta: float,
+    end_delta: float,
 ) -> str:
     start_delta = 2.5  # View of the whole set
-    end_delta = 0.001  # Zoomed in this much at the end
+    end_delta = 0.00001  # Zoomed in this much at the end
 
-    # calculate the zoom levels for each frame
+    # geometric sequence of zoom levels
     zoom_levels = np.geomspace(start_delta, end_delta, num_frames)
 
     # calculate the coordinates for each frame based on zoom level
@@ -101,9 +98,7 @@ def main():
     )
 
     if user_input.lower() == "video":
-        # Connect to the Ray cluster
         connect_to_server()
-        print("Connected to Ray cluster")
 
         # Default parameters
         default_point = "-1.338238635,-0.057237059"  # Re, Im
@@ -112,6 +107,8 @@ def main():
         default_frame_height = "1000"  # HD resolution
         default_maxiter = "1000"
         default_fps = "15"
+        start_delta = 2.5  # View of the whole set
+        end_delta = 0.00001
 
         # Get user's custom parameters or use defaults
         point_str = get_user_input(
@@ -136,10 +133,14 @@ def main():
         )
         fps = int(get_user_input("Enter the FPS", default_fps))
 
+        start_delta = float(get_user_input("Enter the starting delta", start_delta))
+
+        end_delta = float(get_user_input("Enter the ending delta", end_delta))
+
         # Request the Mandelbrot video
         st = time.time()
         video_filename = request_mandelbrot_video(
-            point, num_frames, fps, frame_dimensions, maxiter
+            point, num_frames, fps, frame_dimensions, maxiter, start_delta, end_delta
         )
         print(f"Video compiled: {video_filename}")
         print(f"Time elapsed: {time.time() - st}")

@@ -7,6 +7,7 @@ from __future__ import absolute_import, print_function
 
 import base64
 import io
+import platform as plat
 import time as t
 from io import BytesIO
 
@@ -16,7 +17,6 @@ import pyopencl as cl
 import ray
 from matplotlib import pyplot as plt
 from PIL import Image
-import platform as plat
 
 
 def mandelbrot_opencl(q, maxiter):

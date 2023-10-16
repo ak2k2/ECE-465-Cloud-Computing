@@ -10,6 +10,7 @@ from mandelbrot_opencl import generate_frame
 from PIL import Image
 
 import logging
+import subprocess
 
 
 # Set up logging level to debug to see detailed logs from Ray
@@ -18,12 +19,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 def connect_to_server():
     try:
-        # Attempt to connect to the Ray server
-        ray.init(
-            address="ray://192.168.1.155:6379",
-            logging_level=logging.DEBUG,
-            log_to_driver=True,
-        )
+        subprocess.run(["ray", "stop"])
+        subprocess.run("ray start", "--address=192.168.1.155:6379", "--verbose")
+        ray.init(address="auto")
 
         print("Connected to Ray server!")
 

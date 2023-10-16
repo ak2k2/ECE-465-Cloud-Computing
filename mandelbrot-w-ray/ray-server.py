@@ -8,14 +8,21 @@ import ray
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+subprocess.run(["ray", "stop"])
+
 # specify your desired port
 port = "6379"
 
-subprocess.run(["ray", "stop"])
-
 # Start the Ray head node with the subprocess module
 subprocess.run(
-    ["ray", "start", "--head", "--node-ip-address=0.0.0.0", f"--port={port}"]
+    [
+        "ray",
+        "start",
+        "--head",
+        "--node-ip-address=0.0.0.0",
+        f"--port={port}",
+        "--verbose",
+    ]
 )
 
 

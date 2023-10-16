@@ -48,9 +48,6 @@ def request_mandelbrot_video(
     start_delta: float,
     end_delta: float,
 ) -> str:
-    start_delta = 2.5  # View of the whole set
-    end_delta = 0.00001  # Zoomed in this much at the end
-
     # geometric sequence of zoom levels
     zoom_levels = np.geomspace(start_delta, end_delta, num_frames)
 

@@ -93,11 +93,11 @@ def generate_frame(coords: tuple, width: int, height: int, maxiter: int):
     )
 
     # Normalize the iteration counts for coloring
-    norm = mcolors.PowerNorm(0.3)  # Using a PowerNorm for non-linear scaling
+    norm = mcolors.PowerNorm(0.2)  # Using a PowerNorm for non-linear scaling
 
     # Create a plot for the current frame
     plt.figure(
-        figsize=(width / 100, height / 100), dpi=100
+        figsize=(width / 100, height / 100), dpi=150
     )  # Assuming the DPI you'd like to use
     plt.axis("off")  # Turn off the axis
     plt.imshow(mandelbrot_image, cmap="nipy_spectral", norm=norm)

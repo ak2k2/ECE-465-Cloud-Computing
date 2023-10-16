@@ -6,14 +6,14 @@ import time
 def main():
     # Initialize Ray
     ray.init(
-        address=None,
-        _node_ip_address="192.168.1.11",
+        address="0.0.0.0:6379",
         _redis_password="5241590000000000",
+        _node_ip_address="0.0.0.0",
     )
 
-    print("Ray Server started at 192.168.1.11:6379")
+    print("Ray Server Started...")
     while True:
-        print("♥ ♥ ♥ ♥")
+        print("♥")
         time.sleep(60)
 
 

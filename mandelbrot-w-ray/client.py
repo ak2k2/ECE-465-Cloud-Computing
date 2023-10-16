@@ -11,7 +11,7 @@ import io
 
 
 def connect_to_server():
-    ray.init(address="auto")
+    ray.init(address="ray://192.168.1.11:6379", _redis_password="5241590000000000")
 
 
 def compile_video(frame_images: list, fps: int = 15) -> str:
@@ -83,13 +83,14 @@ def main():
     if user_input.lower() == "video":
         # Connect to the Ray cluster
         connect_to_server()
+        print("Connected to Ray cluster")
 
         # Define parameters for the Mandelbrot video request
         point = (
             -0.706710842,  # Re
             -0.288516551,  # Im
         )
-        num_frames = 100  # example frame count
+        num_frames = 2  # example frame count
         frame_dimensions = (2000, 2000)  # HD resolution
         maxiter = 100  # example max iterations
 

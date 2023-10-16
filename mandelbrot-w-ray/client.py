@@ -1,6 +1,8 @@
 # client.py
 import base64
 import io
+import logging
+import subprocess
 import time
 
 import moviepy.editor as mpy
@@ -8,10 +10,6 @@ import numpy as np
 import ray
 from mandelbrot_opencl import generate_frame
 from PIL import Image
-
-import logging
-import subprocess
-
 
 logging.basicConfig(level=logging.INFO)
 
@@ -92,6 +90,11 @@ def request_mandelbrot_video(
     return video
 
 
+def get_user_input(prompt, default):
+    user_input = input(f"{prompt} (default is {default}): ")
+    return user_input.strip() or default
+
+
 def main():
     user_input = input(
         "Do you want to generate a video or act as a worker? (video/worker): "
@@ -102,18 +105,38 @@ def main():
         connect_to_server()
         print("Connected to Ray cluster")
 
-        # Define parameters for the Mandelbrot video request
-        point = (
-            -1.338238635,  # Re
-            -0.057237059,  # Im
+        # Default parameters
+        default_point = "-1.338238635,-0.057237059"  # Re, Im
+        default_num_frames = "200"
+        default_frame_width = "1000"
+        default_frame_height = "1000"  # HD resolution
+        default_maxiter = "1000"
+        default_fps = "15"
+
+        # Get user's custom parameters or use defaults
+        point_str = get_user_input(
+            "Enter the point to zoom into as two floats, separated by a comma (e.g., -1.3,-0.05)",
+            default_point,
         )
-        num_frames = 200  # example frame count
-        frame_dimensions = (2000, 2000)  # HD resolution
-        maxiter = 2000  # example max iterations
-        fps = 15
+        point = tuple(map(float, point_str.split(",")))
+
+        num_frames = int(
+            get_user_input("Enter the number of frames", default_num_frames)
+        )
+        frame_width = int(get_user_input("Enter the frame width", default_frame_width))
+        frame_height = int(
+            get_user_input("Enter the frame height", default_frame_height)
+        )
+        frame_dimensions = (frame_width, frame_height)
+
+        maxiter = int(
+            get_user_input(
+                "Enter the starting value for max iterations", default_maxiter
+            )
+        )
+        fps = int(get_user_input("Enter the FPS", default_fps))
 
         # Request the Mandelbrot video
-
         st = time.time()
         video_filename = request_mandelbrot_video(
             point, num_frames, fps, frame_dimensions, maxiter

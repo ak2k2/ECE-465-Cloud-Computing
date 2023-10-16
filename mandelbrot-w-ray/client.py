@@ -1,14 +1,13 @@
 # client.py
 import base64
+import io
+import time
 
 import moviepy.editor as mpy
 import numpy as np
 import ray
 from mandelbrot_opencl import generate_frame
 from PIL import Image
-
-import io
-import os
 
 
 def connect_to_server():
@@ -106,8 +105,6 @@ def main():
         print(f"Time elapsed: {time.time() - st}")
 
     elif user_input.lower() == "worker":
-        import time
-
         connect_to_server()
         print("Worker connected to server")
 

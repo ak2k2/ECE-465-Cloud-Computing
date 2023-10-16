@@ -70,7 +70,7 @@ def request_mandelbrot_video(
     ]
 
     # Compile the frames into a video
-    video = compile_video(frame_images, fps=15)
+    video = compile_video(frame_images, fps)
 
     return video
 
@@ -93,10 +93,11 @@ def main():
         num_frames = 2  # example frame count
         frame_dimensions = (2000, 2000)  # HD resolution
         maxiter = 100  # example max iterations
+        fps = 30
 
         # Request the Mandelbrot video
         video_filename = request_mandelbrot_video(
-            point, num_frames, frame_dimensions, maxiter
+            point, num_frames, fps, frame_dimensions, maxiter
         )
 
         print(f"Video compiled: {video_filename}")

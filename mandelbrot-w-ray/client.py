@@ -45,20 +45,22 @@ def request_mandelbrot_video(
     zoom_levels = np.geomspace(start_delta, end_delta, num_frames)
 
     # calculate the coordinates for each frame based on zoom level
-    frames = [
-        generate_frame.remote(
-            (
-                point[0] - zoom / 2,  # xmin
-                point[0] + zoom / 2,  # xmax
-                point[1] - zoom / 2,  # ymin
-                point[1] + zoom / 2,  # ymax
-            ),
-            frame_dimensions[0],
-            frame_dimensions[1],
-            maxiter,
+    frames = []
+    for zoom in zoom_levels:
+        frames.append(
+            generate_frame.remote(
+                (
+                    point[0] - zoom / 2,  # xmin
+                    point[0] + zoom / 2,  # xmax
+                    point[1] - zoom / 2,  # ymin
+                    point[1] + zoom / 2,  # ymax
+                ),
+                frame_dimensions[0],
+                frame_dimensions[1],
+                maxiter,
+            )
         )
-        for zoom in zoom_levels
-    ]
+        maxiter += 5  # increase the max iterations for each frame
 
     # Retrieve the frames from the futures.
     frame_images = ray.get(frames)
@@ -87,13 +89,13 @@ def main():
 
         # Define parameters for the Mandelbrot video request
         point = (
-            -0.7241144,  # Re
-            -0.286370123,  # Im
+            -1.358238635,  # Re
+            -0.037237059,  # Im
         )
-        num_frames = 350  # example frame count
+        num_frames = 100  # example frame count
         frame_dimensions = (1000, 1000)  # HD resolution
-        maxiter = 200  # example max iterations
-        fps = 20
+        maxiter = 400  # example max iterations
+        fps = 30
 
         # Request the Mandelbrot video
 

@@ -19,8 +19,7 @@ def send_request(request_json):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         s.sendall(request_json.encode("utf-8"))
-
-        # Now, receive the video file back from the server
+        
         with ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(receive_video, s)
             return future.result()

@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 
 def receive_video(s):
-    with open("clients-stuff/received_video.mp4", "wb") as f:
+    with open("mock_client/received_video.mp4", "wb") as f:
         while True:
             video_data = s.recv(1024)
             if not video_data:

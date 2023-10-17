@@ -27,15 +27,6 @@ subprocess.run(
 
 
 def main():
-    # ray.init(
-    #     _node_ip_address="0.0.0.0",
-    #     _redis_password="5241590000000000",
-    #     _port=6379,
-    #     dashboard_host="0.0.0.0",
-    #     configure_logging=True,
-    #     logging_level=logging.DEBUG,
-    # )
-
     ray.init(address=f"ray://0.0.0.0:{port}")
 
     logger.info("Ray Server Started...")

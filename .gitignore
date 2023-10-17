@@ -1,6 +1,11 @@
 # Mac
 *.DS_Store
 
+# Pycahce
+__pycache__
+mandelbrot-w-ray/DB/*
+mandelbrot-w-ray/mock_client/*
+
 # Venv
 rayenv/*
 

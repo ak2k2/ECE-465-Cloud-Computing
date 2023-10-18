@@ -1,4 +1,4 @@
-# Overview
+# Fast Fractal Zoom Sequences Using Ray Cluster
 This repository contains scripts to set up a Ray cluster and distribute the computation necessary to generate multiple frames of the Mandelbrot set and animate an mp4 video of a detailed fractal zoom sequence.
 
 A client submits a JSON payload containing a point on the (real, imaginary) axis, along with parameters to control the granularity and number of frames in a sequence.

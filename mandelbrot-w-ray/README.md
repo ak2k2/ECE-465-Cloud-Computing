@@ -1,7 +1,7 @@
 # Overview
-This repository contains scripts to set up a Ray cluster distribute computation necessary to generate multiple frames of the Mandelbrot set and animate an mp4 video of a detailed fractal zoom sequence.
+This repository contains scripts to set up a Ray cluster and distribute the computation necessary to generate multiple frames of the Mandelbrot set and animate an mp4 video of a detailed fractal zoom sequence.
 
-A client submits a JSON payload containing a point on the (real,imaginary) axis, along with parameters to control the granularity and number of frames in a sequence.
+A client submits a JSON payload containing a point on the (real, imaginary) axis, along with parameters to control the granularity and number of frames in a sequence.
 
 The spawner_ray_* shell scripts automate the process of initializing both a head (master) node and worker nodes, and launching a ray dashboard to monitor the cluster's status.
 

@@ -1,5 +1,13 @@
-# Overview
-This repository contains scripts to set up a Ray cluster, intended for distributed computation tasks necessary to generate frames of the Mandelbrot set, ultimately creating detailed animated zoom sequences. The setup encompasses instructions for initializing both the head (master) and worker nodes, and it offers utilities to verify the cluster's active status. The system leverages multiple compute nodes (both CPU and GPU) to parallelize the tasks, managing futures/promises from the head.
+# Fast Fractal Zoom Sequences Using Ray Cluster
+This repository contains scripts to set up a Ray cluster and distribute the computation necessary to generate multiple frames of the Mandelbrot set and animate an mp4 video of a detailed fractal zoom sequence.
+
+A client submits a JSON payload containing a point on the (real, imaginary) axis, along with parameters to control the granularity and number of frames in a sequence.
+
+The spawner_ray_* shell scripts automate the process of initializing both a head (master) node and worker nodes, and launching a ray dashboard to monitor the cluster's status.
+
+The core mandelbrot set computation uses PyOpenCL to carry out independent floating point operations using supported CPU and GPU cores/processing units.
+
+The master node in a cluster stores sequences in the DB directory, and serves clients their mp4 animations via a configurable multithreaded socket.
 
 ---
 The **client.py** script facilitates access to the Mandelbrot service by sending a straightforward JSON payload to the socket initiated by **ray_head.py**.
@@ -18,7 +26,7 @@ The **client.py** script facilitates access to the Mandelbrot service by sending
 ```
 ---
 
-Interestingly, the client itself can initiate a raw server through a shell script and integrate into the distributed computing cluster, all without requiring understanding of the source code in ray_head.py.
+The client submits a request directly to the distributed computing cluster via the head node, without necessarily requiring access to the source code in ray_head.py.
 
 ---
 

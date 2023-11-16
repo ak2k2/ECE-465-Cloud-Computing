@@ -1,6 +1,6 @@
 # Fast Fractal Zoom Sequences Using Ray Cluster
 
-![Overview](mandelbrot-service-ray/Mandelbrot-Distributed-Scheme.pdf)
+![Overview](Mandelbrot-Distributed-Scheme.pdf)
 
 
 This repository contains scripts to set up a Ray cluster and distribute the computation necessary to generate multiple frames of the Mandelbrot set and animate an mp4 video of a detailed fractal zoom sequence.

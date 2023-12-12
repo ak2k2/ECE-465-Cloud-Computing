@@ -7,13 +7,13 @@ profiler = cProfile.Profile()
 profiler.enable()
 
 video_file = generate_mandelbrot_video(
-    center_point=(-1.5, 0),
-    num_frames=80,
+    center_point=(-1.768778839, 0.001738953),
+    num_frames=6,
     fps=20,
     initial_scale=2.5,
-    scale_factor=1.20,
-    frame_dimensions=(1000, 1000),
-    maxiter=520,
+    scale_factor=1.23,
+    frame_dimensions=(1200, 1200),
+    maxiter=5520,
 )
 
 print(f"Video saved to {video_file}")

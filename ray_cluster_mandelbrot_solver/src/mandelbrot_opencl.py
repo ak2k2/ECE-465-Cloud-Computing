@@ -11,6 +11,7 @@ from matplotlib import cm
 from PIL import Image
 
 # GL enabled mandelbrot set computation from Jean-François Puget: https://gist.github.com/jfpuget/60e07a82dece69b011bb)
+# SWITCH TO THIS?: https://github.com/jlesuffleur/gpu_mandelbrot/blob/master/mandelbrot.py
 PYCL_SCRIPT = """
     #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
     __kernel void mandelbrot(__global float2 *q,

@@ -1,0 +1,16 @@
+version: '3'
+services:
+  ray_head:
+    build: .
+    ports:
+      - "6379:6379"
+    environment:
+      - PYTHONPATH=/usr/src/app
+
+  ray_worker:
+    build: .
+    environment:
+      - PYTHONPATH=/usr/src/app
+      - RAY_ADDRESS=ray_head:6379
+    depends_on:
+      - ray_head

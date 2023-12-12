@@ -1,17 +1,35 @@
 from __future__ import absolute_import, print_function
 
-import base64
 import io
 import platform as plat
-import time as t
-from io import BytesIO
 
 import matplotlib.colors as mcolors
 import numpy as np
 import pyopencl as cl
 import ray
 from matplotlib import pyplot as plt
-from PIL import Image
+
+# GL enabled mandelbrot set computation from Jean-François Puget: https://gist.github.com/jfpuget/60e07a82dece69b011bb)
+PYCL_SCRIPT = """
+    #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
+    __kernel void mandelbrot(__global float2 *q,
+                     __global ushort *output, ushort const maxiter)
+    {
+        int gid = get_global_id(0);
+        float nreal, real = 0;
+        float imag = 0;
+        output[gid] = 0;
+        for(int curiter = 0; curiter < maxiter; curiter++) {
+            nreal = real*real - imag*imag + q[gid].x;
+            imag = 2* real*imag + q[gid].y;
+            real = nreal;
+            if (real*real + imag*imag > 4.0f){
+                 output[gid] = curiter;
+                 break;
+            }
+        }
+    }
+    """
 
 
 def mandelbrot_opencl(q, maxiter):
@@ -37,6 +55,7 @@ def mandelbrot_opencl(q, maxiter):
     else:
         device = devices[0]  # My ubuntu server only has a RYZEN
 
+    print("Using OpenCL device: ", device.name)
     # Create a context with the selected device
     ctx = cl.Context([device])
     queue = cl.CommandQueue(ctx)
@@ -44,26 +63,7 @@ def mandelbrot_opencl(q, maxiter):
 
     prg = cl.Program(
         ctx,
-        """
-    #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
-    __kernel void mandelbrot(__global float2 *q,
-                     __global ushort *output, ushort const maxiter)
-    {
-        int gid = get_global_id(0);
-        float nreal, real = 0;
-        float imag = 0;
-        output[gid] = 0;
-        for(int curiter = 0; curiter < maxiter; curiter++) {
-            nreal = real*real - imag*imag + q[gid].x;
-            imag = 2* real*imag + q[gid].y;
-            real = nreal;
-            if (real*real + imag*imag > 4.0f){
-                 output[gid] = curiter;
-                 break;
-            }
-        }
-    }
-    """,
+        PYCL_SCRIPT,
     ).build()
 
     mf = cl.mem_flags
@@ -97,22 +97,32 @@ def generate_frame(coords: tuple, width: int, height: int, maxiter: int):
         xmin, xmax, ymin, ymax, width, height, maxiter
     )
 
-    # PowerNorm the iteration counts for coloring
-    norm = mcolors.PowerNorm(0.2)
+    # Rotate the image 90 degrees counterclockwise
+    mandelbrot_image = np.rot90(mandelbrot_image)
 
-    # Create a plot for the current frame
-    plt.figure(figsize=(width / 100, height / 100), dpi=150)  # set DPI
+    # flip the image top to bottom
+    mandelbrot_image = np.flipud(mandelbrot_image)
+
+    # Apply a more sophisticated colormap with normalization
+    norm = mcolors.PowerNorm(0.3)
+    cmap = plt.get_cmap(
+        "twilight_shifted"
+    )  # Using a 'twilight_shifted' colormap for a vibrant look
+
+    # Create a high-resolution plot for the current frame
+    plt.figure(figsize=(width / 100, height / 100), dpi=300)
 
     plt.axis("off")
-    plt.imshow(mandelbrot_image, cmap="nipy_spectral", norm=norm)
+    plt.imshow(mandelbrot_image, cmap=cmap, norm=norm, interpolation="bilinear")
 
-    # Save the plot to a bytes buffer
+    # Apply post-processing for enhanced visuals
+    # (Optional techniques like smoothing, sharpening, etc., can be added here)
+
+    # Convert the image to a byte array for transmission
     buffer = io.BytesIO()
     plt.savefig(buffer, format="png", bbox_inches="tight", pad_inches=0)
     plt.close()
+    buffer.seek(0)
+    image_data = buffer.read()
 
-    # Convert the bytes buffer value to a base64 string to be easily transferred
-    base64_bytes = base64.b64encode(buffer.getvalue())
-    base64_string = base64_bytes.decode("utf8")
-
-    return base64_string
+    return image_data

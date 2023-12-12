@@ -31,8 +31,12 @@ def main():
 
     logger.info("Ray Server Started...")
     while True:
+        # prevent ray from timing out
+
+        ray.get([])
+
         logger.info("♥")
-        time.sleep(60)
+        time.sleep(5)
 
 
 if __name__ == "__main__":

@@ -7,7 +7,8 @@ import matplotlib.colors as mcolors
 import numpy as np
 import pyopencl as cl
 import ray
-from matplotlib import pyplot as plt
+from matplotlib import cm
+from PIL import Image
 
 # GL enabled mandelbrot set computation from Jean-François Puget: https://gist.github.com/jfpuget/60e07a82dece69b011bb)
 PYCL_SCRIPT = """
@@ -90,38 +91,38 @@ def mandelbrot_set3(xmin, xmax, ymin, ymax, width, height, maxiter):
 
 
 @ray.remote
-def generate_frame(coords: tuple, width: int, height: int, maxiter: int):
+def compute_mandelbrot_frame(coords: tuple, width: int, height: int, maxiter: int):
     # Calculate Mandelbrot set based on provided coordinates
     xmin, xmax, ymin, ymax = coords
-    x, y, mandelbrot_image = mandelbrot_set3(
-        xmin, xmax, ymin, ymax, width, height, maxiter
-    )
+    mandelbrot_data = mandelbrot_set3(xmin, xmax, ymin, ymax, width, height, maxiter)
+    return mandelbrot_data, width, height
+
+
+@ray.remote
+def process_frame(mandelbrot_image: tuple, width: int, height: int):
+    # Convert the image data to a numpy array
+    mandelbrot_image = np.array(mandelbrot_image, dtype=np.uint16)
 
     # Rotate the image 90 degrees counterclockwise
     mandelbrot_image = np.rot90(mandelbrot_image)
 
-    # flip the image top to bottom
-    mandelbrot_image = np.flipud(mandelbrot_image)
-
     # Apply a more sophisticated colormap with normalization
     norm = mcolors.PowerNorm(0.3)
-    cmap = plt.get_cmap(
-        "twilight_shifted"
-    )  # Using a 'twilight_shifted' colormap for a vibrant look
+    cmap = cm.get_cmap("twilight_shifted")  # Using a 'twilight_shifted' colormap
 
-    # Create a high-resolution plot for the current frame
-    plt.figure(figsize=(width / 100, height / 100), dpi=300)
+    # Apply the colormap to the image
+    normalized_image = norm(mandelbrot_image)
+    colored_image = cmap(normalized_image)
 
-    plt.axis("off")
-    plt.imshow(mandelbrot_image, cmap=cmap, norm=norm, interpolation="bilinear")
+    # Convert to RGBA values and scale to [0, 255]
+    colored_image = (colored_image[:, :, :3] * 255).astype(np.uint8)
 
-    # Apply post-processing for enhanced visuals
-    # (Optional techniques like smoothing, sharpening, etc., can be added here)
+    # Convert to an image for encoding
+    img = Image.fromarray(colored_image)
 
-    # Convert the image to a byte array for transmission
+    # Encode the image as PNG
     buffer = io.BytesIO()
-    plt.savefig(buffer, format="png", bbox_inches="tight", pad_inches=0)
-    plt.close()
+    img.save(buffer, format="PNG")
     buffer.seek(0)
     image_data = buffer.read()
 

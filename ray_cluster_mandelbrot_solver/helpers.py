@@ -1,27 +1,37 @@
 import io
 
 import moviepy.editor as mpy
+import numpy as np
 import ray
 from PIL import Image
 
-from mandelbrot_opencl import generate_frame
+from mandelbrot_opencl import compute_mandelbrot_frame, process_frame
 
 
-def compile_video(frame_images: list, fps: int = 15) -> str:
-    # Save images and store their filepaths
-    frames = []
-    DB_path = "DB"
-    for i, img in enumerate(frame_images):
+@ray.remote
+def save_image(img_data, filename):
+    image = Image.open(io.BytesIO(img_data))
+    image.save(filename)
+
+
+def compile_video(frame_images: list, fps: int = 15, DB_path: str = "DB") -> str:
+    # Parallel image saving
+    save_tasks = []
+    for i, img_data in enumerate(frame_images):
         filename = f"{DB_path}/frame_{i}.png"
-        img.save(filename)
-        frames.append(filename)
+        task = save_image.remote(img_data, filename)
+        save_tasks.append(task)
+
+    # Wait for all images to be saved
+    ray.get(save_tasks)
 
     # Create video from frames
+    frames = [f"{DB_path}/frame_{i}.png" for i in range(len(frame_images))]
     clip = mpy.ImageSequenceClip(frames, fps=fps)
     video_filename = DB_path + "/demo_zoom.mp4"
     clip.write_videofile(video_filename)
 
-    return video_filename  # return the filename of created video
+    return video_filename
 
 
 def generate_mandelbrot_video(
@@ -33,11 +43,11 @@ def generate_mandelbrot_video(
     frame_dimensions: tuple[int, int],
     maxiter: int,
 ) -> str:
-    frames = []
+    compute_tasks = []
     current_scale = initial_scale
 
+    # Step 1: Schedule computation of Mandelbrot data for each frame
     for _ in range(num_frames):
-        # Calculate the coordinates for each frame based on the current scale
         half_width = current_scale * frame_dimensions[0] / frame_dimensions[1] / 2
         half_height = current_scale / 2
 
@@ -46,8 +56,8 @@ def generate_mandelbrot_video(
         ymin = center_point[1] - half_height
         ymax = center_point[1] + half_height
 
-        frames.append(
-            generate_frame.remote(
+        compute_tasks.append(
+            compute_mandelbrot_frame.remote(
                 (xmin, xmax, ymin, ymax),
                 frame_dimensions[0],
                 frame_dimensions[1],
@@ -55,16 +65,21 @@ def generate_mandelbrot_video(
             )
         )
 
-        # Update the scale for the next frame
         current_scale /= scale_factor
 
-    # Retrieve the frames from the futures
-    frame_images = ray.get(frames)
+    # Retrieve the computed Mandelbrot data
+    computed_frames = ray.get(compute_tasks)
 
-    # Convert byte arrays to images
-    frame_images = [Image.open(io.BytesIO(frame_data)) for frame_data in frame_images]
+    # Extract the correct Mandelbrot data for processing
+    process_tasks = [
+        process_frame.remote(frame_data[2], width, height)  # Change here
+        for frame_data, width, height in computed_frames
+    ]
 
-    # Compile the frames into a video
-    video = compile_video(frame_images, fps)
+    # Retrieve the processed images
+    processed_images = ray.get(process_tasks)
+
+    # Step 3: Compile the frames into a video
+    video = compile_video(processed_images, fps)
 
     return video

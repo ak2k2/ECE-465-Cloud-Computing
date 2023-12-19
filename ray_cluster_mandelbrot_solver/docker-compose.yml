@@ -1,14 +1,18 @@
 version: '3'
 services:
   ray_head:
-    build: .
+    build:
+      context: .   # The directory containing the 'docker' folder
+      dockerfile: docker/Dockerfile   # Path to the Dockerfile relative to the context
     ports:
       - "6379:6379"
     environment:
       - PYTHONPATH=/usr/src/app
 
   ray_worker:
-    build: .
+    build:
+      context: .   # The directory containing the 'docker' folder
+      dockerfile: docker/Dockerfile   # Path to the Dockerfile relative to the context
     environment:
       - PYTHONPATH=/usr/src/app
       - RAY_ADDRESS=ray_head:6379

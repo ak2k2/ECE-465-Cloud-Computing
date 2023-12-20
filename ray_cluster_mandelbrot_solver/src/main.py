@@ -55,7 +55,7 @@ if __name__ == "__main__":
         fps=20,
         initial_scale=2.5,
         scale_factor=1.13,
-        frame_dimensions=(2000, 2000),
+        frame_dimensions=(1000, 1000),
         maxiter=2520,
     )
 

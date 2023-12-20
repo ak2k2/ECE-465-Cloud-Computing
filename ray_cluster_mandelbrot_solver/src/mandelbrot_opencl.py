@@ -39,27 +39,28 @@ def mandelbrot_opencl(q, maxiter):
     Fast Mandelbrot set computation using numpy and numba (credit to Jean-François Puget: https://gist.github.com/jfpuget/60e07a82dece69b011bb)
     """
 
-    platforms = cl.get_platforms()
-    if not platforms:
-        raise ValueError("No OpenCL platforms found.")
-    platform = platforms[0]
+    # platforms = cl.get_platforms()
+    # if not platforms:
+    #     raise ValueError("No OpenCL platforms found.")
+    # platform = platforms[0]
 
-    devices = platform.get_devices()
-    if not devices:
-        raise ValueError("No OpenCL devices found on the selected platform.")
+    # devices = platform.get_devices()
+    # if not devices:
+    #     raise ValueError("No OpenCL devices found on the selected platform.")
 
-    is_mac = plat.system() == "Darwin"  # "Darwin" for a MacOS system
-    if is_mac:
-        # Chose Intel(R) Iris(TM) Plus Graphics
-        device = devices[
-            1
-        ]  # Because I have a Macbook Pro with a opencl enabled CPU and GPU
-    else:
-        device = devices[0]  # My ubuntu server only has a RYZEN
+    # is_mac = plat.system() == "Darwin"  # "Darwin" for a MacOS system
+    # if is_mac:
+    #     # Chose Intel(R) Iris(TM) Plus Graphics
+    #     device = devices[
+    #         1
+    #     ]  # Because I have a Macbook Pro with a opencl enabled CPU and GPU
+    # else:
+    #     device = devices[0]  # BeelinkPC only has a RYZEN
 
-    print("Using OpenCL device: ", device.name)
+    # print("Using OpenCL device: ", device.name)
     # Create a context with the selected device
-    ctx = cl.Context([device])
+    # ctx = cl.Context([device])
+    ctx = cl.Context([cl.get_platforms()[0].get_devices()[0]])
     queue = cl.CommandQueue(ctx)
     output = np.empty(q.shape[0], dtype=np.uint16)
 

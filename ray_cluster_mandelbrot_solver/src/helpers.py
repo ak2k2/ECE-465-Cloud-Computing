@@ -1,11 +1,13 @@
 import io
+import os
+import tempfile
 
 import moviepy.editor as mpy
 import numpy as np
 import ray
 from PIL import Image
 
-from mandelbrot_opencl import compute_mandelbrot_frame, process_frame
+from mandelbrot import compute_mandelbrot_frame, process_frame
 
 
 @ray.remote
@@ -14,24 +16,36 @@ def save_image(img_data, filename):
     image.save(filename)
 
 
-def compile_video(frame_images: list, fps: int = 15, DB_path: str = "DB") -> str:
-    # Parallel image saving
-    save_tasks = []
-    for i, img_data in enumerate(frame_images):
-        filename = f"{DB_path}/frame_{i}.png"
-        task = save_image.remote(img_data, filename)
-        save_tasks.append(task)
+def compile_video(frame_images: list, fps: int = 15) -> io.BytesIO:
+    # Convert in-memory images to NumPy arrays and then to moviepy ImageClips
+    clips = []
+    for img_data in frame_images:
+        with Image.open(io.BytesIO(img_data)) as img:
+            numpy_image = np.array(img)
+            clip = mpy.ImageClip(numpy_image, duration=1.0 / fps)
+            clips.append(clip)
 
-    # Wait for all images to be saved
-    ray.get(save_tasks)
+    # Concatenate clips to make a video
+    video = mpy.concatenate_videoclips(clips, method="compose")
 
-    # Create video from frames
-    frames = [f"{DB_path}/frame_{i}.png" for i in range(len(frame_images))]
-    clip = mpy.ImageSequenceClip(frames, fps=fps)
-    video_filename = DB_path + "/demo_zoom.mp4"
-    clip.write_videofile(video_filename)
+    # Create a temporary file to write the video
+    with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_file:
+        video_file_path = temp_file.name
 
-    return video_filename
+    # Write the video to the temporary file
+    video.write_videofile(
+        video_file_path, codec="libx264", audio=False, fps=fps, bitrate="5000k"
+    )
+
+    # Read the video from the temporary file into a BytesIO buffer
+    with open(video_file_path, "rb") as file:
+        video_buffer = io.BytesIO(file.read())
+
+    # Optionally, delete the temporary file here if you want to clean up
+    os.remove(video_file_path)
+
+    video_buffer.seek(0)
+    return video_buffer
 
 
 def generate_mandelbrot_video(

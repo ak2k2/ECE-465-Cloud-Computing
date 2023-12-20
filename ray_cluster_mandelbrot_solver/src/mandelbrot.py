@@ -8,6 +8,16 @@ import numpy as np
 import pyopencl as cl
 import ray
 from matplotlib import cm
+from numba import (
+    complex64,
+    complex128,
+    float32,
+    float64,
+    guvectorize,
+    int32,
+    jit,
+    vectorize,
+)
 from PIL import Image
 
 # # GL enabled mandelbrot set computation from Jean-François Puget: https://gist.github.com/jfpuget/60e07a82dece69b011bb)
@@ -88,19 +98,6 @@ from PIL import Image
 #     return (r1, r2, n3.T)
 
 
-import numpy as np
-from numba import (
-    complex64,
-    float32,
-    float64,
-    guvectorize,
-    int32,
-    jit,
-    vectorize,
-    complex128,
-)
-
-
 @jit(int32(complex128, int32))
 def mandelbrot_j(c, maxiter):
     nreal = 0.0
@@ -164,6 +161,5 @@ def process_frame(mandelbrot_image: tuple, width: int, height: int):
     buffer = io.BytesIO()
     img.save(buffer, format="PNG")
     buffer.seek(0)
-    image_data = buffer.read()
 
-    return image_data
+    return buffer.read()

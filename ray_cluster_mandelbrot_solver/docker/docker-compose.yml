@@ -1,0 +1,11 @@
+version: '3'
+services:
+  ray_flask_app:
+    build:
+      context: ..   # The parent directory is now the context
+      dockerfile: docker/Dockerfile
+    network_mode: host
+    ports:
+      - "5010:5010" # Expose Flask app port
+    environment:
+      - PYTHONPATH=/usr/src/app

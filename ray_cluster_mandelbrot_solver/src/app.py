@@ -1,29 +1,19 @@
 import subprocess
 
-import ray
-import requests
+import yaml
 from flask import Flask, Response
 
 from helpers import generate_mandelbrot_video
 
-# Configuration for Ray
-head_node_ip = "127.94.0.1"
-head_node_port = "6379"
-ray_head_address = f"{head_node_ip}:{head_node_port}"
+app = Flask(__name__)
 
 
-def is_ray_head_running():
-    try:
-        response = requests.get(f"http://{head_node_ip}:8265")
-        return response.status_code == 200
-    except requests.ConnectionError:
-        return False
+def initialize_ray(config):
+    head_node_ip = config["ray"].get("head_node_ip", "127.0.0.1")
+    head_node_port = "6379"
+    ray_head_address = f"{head_node_ip}:{head_node_port}"
 
-
-def start_ray_node(is_head):
-    subprocess.run(["ray", "stop"])  # Stop any existing Ray instance
-
-    if is_head:
+    if config["ray"]["action"] == "c":
         subprocess.run(
             [
                 "ray",
@@ -38,18 +28,6 @@ def start_ray_node(is_head):
         )
     else:
         subprocess.run(["ray", "start", "--address", ray_head_address, "--verbose"])
-
-
-def initialize_ray():
-    if is_ray_head_running():
-        print("Ray head node detected. Starting as worker node.")
-        start_ray_node(is_head=False)
-    else:
-        print("No Ray head node detected. Starting as head node.")
-        start_ray_node(is_head=True)
-
-
-app = Flask(__name__)
 
 
 @app.route("/generate_video")
@@ -67,5 +45,7 @@ def generate_video():
 
 
 if __name__ == "__main__":
-    initialize_ray()  # Initialize Ray when the Flask app starts
+    with open("action.yaml", "r") as file:
+        config = yaml.safe_load(file)
+    initialize_ray(config)
     app.run(host="0.0.0.0", port=5010)

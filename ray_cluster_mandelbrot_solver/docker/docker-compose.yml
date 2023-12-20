@@ -4,8 +4,9 @@ services:
     build:
       context: ..   # The parent directory is now the context
       dockerfile: docker/Dockerfile
-    network_mode: host
     ports:
       - "5010:5010" # Expose Flask app port
     environment:
       - PYTHONPATH=/usr/src/app
+    volumes:
+      - ./src/config.yaml:/app/config.yaml

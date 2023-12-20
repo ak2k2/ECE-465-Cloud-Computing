@@ -1,0 +1,3 @@
+ray:
+  action: "c"  # "c" for create or "j" for join
+  head_node_ip: "127.94.0.1"  # only needed if action is "j"

@@ -1,9 +1,11 @@
 import os
 import pathlib
+import socket
 import subprocess
 
 import yaml
 from flask import Flask, Response
+
 from helpers import generate_mandelbrot_video
 
 # set parent directory as working directory
@@ -58,6 +60,63 @@ def generate_video():
         maxiter=1020,
     )
     return Response(video_buffer, mimetype="video/mp4")
+
+
+def is_port_open(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(("localhost", port)) == 0
+
+
+def check_critical_services():
+    # Example check: Verify if Ray is initialized and critical ports are open
+    try:
+        # Check Ray initialization
+        if not ray.is_initialized():
+            return False
+
+        # Flask
+        if not is_port_open(5010):
+            return False
+
+        # Ray head node is running
+        if not is_port_open(6379):
+            return False
+
+        # Ray dashboard is running
+        if not is_port_open(8265):
+            return False
+
+        # Ray GCS server is running
+        if not is_port_open(8075):
+            return False
+
+        if not is_port_open(8076):
+            return False
+
+        if not is_port_open(8077):
+            return False
+
+        if not is_port_open(6666):
+            return False
+
+        # worker nodes 10000-11000
+        for wport in range(10000, 11000):
+            if not is_port_open(wport):
+                return False
+
+        print("Health check passed.")
+        return True
+    except Exception as e:
+        print(f"Health check failed: {e}")
+        return False
+
+
+@app.route("/health")
+def health_check():
+    if check_critical_services():
+        return Response("OK", status=200)
+    else:
+        return Response("Service Unavailable", status=503)
 
 
 if __name__ == "__main__":

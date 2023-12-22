@@ -12,8 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ .
 
 # Flask and Ray
-EXPOSE 5010
-EXPOSE 6379-6381 8265 10001-10999
+EXPOSE 5010 6379 8265 10001-10004 10002-19999
 
 
 # Define environment variable

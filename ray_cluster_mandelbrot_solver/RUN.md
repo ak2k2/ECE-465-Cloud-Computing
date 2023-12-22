@@ -32,3 +32,63 @@
 - **Error Handling:** Consider adding error handling in your script for situations like failed Ray initialization or configuration file reading issues.
 
 With this setup, your Ray cluster should automatically form with your Mac as the head node and the VMs as worker nodes when you run the script on each machine.
+
+
+To set up and test communication between your Dockerized Ray application on a Mac and a VM (using Multipass), you need to ensure that the VM is correctly configured to communicate over the network. Multipass typically uses NAT mode by default, which allows the VM to access external networks through the host machine. Here's how to proceed:
+
+### 1. Set Up Multipass VM
+
+1. **Install Multipass:** If you haven't already, install Multipass on your Mac.
+   
+2. **Launch a VM:** Use Multipass to create a new VM. By default, it should be set up with NAT networking.
+   ```bash
+   multipass launch --name ray-vm
+   ```
+
+3. **Access the VM:** 
+   ```bash
+   multipass shell ray-vm
+   ```
+
+4. **Install Docker in the VM:** If you plan to run your application in Docker inside the VM, install Docker in the VM.
+   ```bash
+   sudo apt-get update
+   sudo apt-get install docker.io
+   ```
+
+### 2. Network Configuration
+
+Multipass VMs are usually configured with NAT out of the box, which means they can access external networks (like the internet) via the host machine. However, for direct communication between your host (Mac) and the VM, you might need to set up port forwarding.
+
+1. **Find the VM's IP Address:** 
+   Inside the VM, use `ip addr` or `ifconfig` to find its IP address.
+
+2. **Set Up Port Forwarding:** 
+   You need to forward the relevant ports from your host to the VM. Multipass supports port forwarding through its command line. For example:
+   ```bash
+   multipass mount <shared-folder> ray-vm:/<mount-point>
+   multipass exec ray-vm -- sudo <command>
+   ```
+   Replace `<shared-folder>`, `<mount-point>`, and `<command>` with appropriate values.
+
+### 3. Run Your Application
+
+1. **On Your Mac:** Run your Dockerized application as you've been doing.
+   
+2. **On the VM:** 
+   - Transfer your application files to the VM or clone from a repository.
+   - Make sure to adjust the configuration to join the Ray cluster (e.g., updating `action.yaml` with the head node's IP address).
+
+### 4. Test the Communication
+
+1. **From the VM:** Try to connect to your application running on the host or vice versa. This could be as simple as accessing a web service or more complex like joining a Ray cluster.
+
+2. **Monitor Ray Dashboard:** If you've set up a Ray cluster, use the Ray dashboard to monitor if the VM node successfully joins the cluster and participates in computation.
+
+### 5. Troubleshooting
+
+- **Firewall Settings:** Ensure that no firewall settings on your Mac or within the VM are blocking the necessary ports.
+- **Correct IP Addresses:** Verify that you're using the correct IP addresses and port numbers in your configurations.
+- **Network Accessibility:** Ensure both the host and VM are on the same network and can communicate with each other.
+
+By following these steps, you should be able to set up and test communication between your Dockerized application on your Mac and a VM using Multipass in NAT mode.

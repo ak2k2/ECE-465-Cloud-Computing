@@ -98,7 +98,7 @@ from PIL import Image
 #     return (r1, r2, n3.T)
 
 
-@jit(int32(complex128, int32))
+@jit(int32(complex128, int32), nopython=True, cache=True, fastmath=True)
 def mandelbrot_j(c, maxiter):
     nreal = 0.0
     real = 0.0
@@ -112,7 +112,14 @@ def mandelbrot_j(c, maxiter):
     return 0
 
 
-@guvectorize([(complex128[:], int32[:], int32[:])], "(n),()->(n)", target="parallel")
+@guvectorize(
+    [(complex128[:], int32[:], int32[:])],
+    "(n),()->(n)",
+    target="parallel",
+    cache=True,
+    nopython=True,
+    fastmath=True,
+)
 def mandelbrot_numpy(c, maxit, output):
     maxiter = maxit[0]
     for i in range(c.shape[0]):
@@ -144,7 +151,8 @@ def process_frame(mandelbrot_image: tuple, width: int, height: int):
     mandelbrot_image = np.rot90(mandelbrot_image)
 
     # Apply a more sophisticated colormap with normalization
-    norm = mcolors.PowerNorm(0.3)
+
+    norm = mcolors.PowerNorm(0.2)
     cmap = cm.get_cmap("twilight_shifted")  # Using a 'twilight_shifted' colormap
 
     # Apply the colormap to the image

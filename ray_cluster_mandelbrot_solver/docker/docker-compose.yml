@@ -2,10 +2,13 @@ version: '3'
 services:
   ray_flask_app:
     build:
-      context: ..   # The parent directory is now the context
+      context: ..
       dockerfile: docker/Dockerfile
     ports:
       - "5010:5010" # Expose Flask app port
+      - "6379-6381:6379-6381" # Ray head node and Redis ports
+      - "8265:8265" # Ray dashboard port
+      - "10001-10999:10001-10999" # Additional Ray ports (object manager, worker nodes, etc.)
     environment:
       - PYTHONPATH=/usr/src/app
     volumes:
